@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.springframework.org/security/tags">
+    <head th:fragment="head">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+        <title>BitcoinHistory</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+        <style>
+            .header {
+                padding: 60px;
+                text-align: center;
+                background: #1abc9c;
+                color: white;
+                font-size: 30px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div style="background: wheat">
+            <div class="text-center">
+                <img th:src="@{/logo.png}" style="height:150px"/>
+            </div>
+            <div>
+                <p>Data by CoinGecko</p>
+            </div>
+        </div>
+
+        <br/>
+
+
+
+        <div class="container">
+
+            <form th:action="@{/}" method="GET" class="form-inline">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="from" class="mx-sm-3">From</label>
+                    <input type="date" class="form-control" id="from" name="from"/>
+                </div>
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="to" class="mx-sm-3">To</label>
+                    <input type="date" class="form-control" id="to" name="to"/>
+                </div>
+                <input type="submit" id="submit" style="display: none"/>
+                <button type="button" class="btn btn-warning mb-2" onclick="document.getElementById('submit').click(); this.disabled=true;">Fetch</button>
+            </form>
+
+            <div th:unless="${queries.size() == 0}">
+                <div class="row" th:each="marketData : ${queries}">
+                    <div class="col">
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="2" th:text="${#temporals.format(marketData.from, 'dd/MM/yyyy') + ' - ' + #temporals.format(marketData.to, 'dd/MM/yyyy')}" class="text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Highest Price: </td>
+                                    <td th:text="${#numbers.formatDecimal(marketData.highestPrice().value, 0, 'WHITESPACE', 2, 'COMMA') + ' €/btc (' + #temporals.format(marketData.highestPrice().date, 'dd/MM/yyyy') + ')'}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Lowest Price: </td>
+                                    <td th:text="${#numbers.formatDecimal(marketData.lowestPrice().value, 0, 'WHITESPACE', 2, 'COMMA') + ' €/btc (' + #temporals.format(marketData.lowestPrice().date, 'dd/MM/yyyy') + ')'}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Longest Bullish </td>
+                                    <td th:if="${marketData.longestBullish().size() > 1}">
+                                        <label th:if="${marketData.longestBullish().get(0).getDays() > 1}" for="select" th:text="${marketData.longestBullish().get(0).getDays() + ' days '}"></label>
+                                        <label th:if="${marketData.longestBullish().get(0).getDays() == 1}" for="select">One day </label>
+                                        <select class="form-select" id="select">        
+                                            <option th:each="trend : ${marketData.longestBullish()}" th:text="${#temporals.format(trend.from, 'dd/MM/yyyy') + ' - ' + #temporals.format(trend.to, 'dd/MM/yyyy')}"></option>
+                                        </select>
+                                    </td> 
+                                    <td th:if="${marketData.longestBullish().isEmpty()}" th:text="${'No bullish trends between ' + #temporals.format(marketData.from, 'dd/MM/yyyy') + ' and ' + #temporals.format(marketData.to, 'dd/MM/yyyy')}"></td>
+                                    <td th:if="${marketData.longestBullish().size() == 1 and marketData.longestBullish().get(0).getDays() > 1}" th:text="${marketData.longestBullish().get(0).getDays() + ' days (' + #temporals.format(marketData.longestBullish().get(0).from, 'dd/MM/yyyy') + ' - ' + #temporals.format(marketData.longestBullish().get(0).to, 'dd/MM/yyyy') + ')'}"></td>
+                                    <td th:if="${marketData.longestBullish().size() == 1 and marketData.longestBullish().get(0).getDays() == 1}" th:text="${'One day (' + #temporals.format(marketData.longestBullish().get(0).from, 'dd/MM/yyyy') + ' - ' + #temporals.format(marketData.longestBullish().get(0).to, 'dd/MM/yyyy') + ')'}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Longest Bearish: </td>
+                                    <td th:if="${marketData.longestBearish().size() > 1}">
+                                        <label th:if="${marketData.longestBearish().get(0).getDays() > 1}" for="select" th:text="${marketData.longestBearish().get(0).getDays() + ' days '}"></label>
+                                        <label th:if="${marketData.longestBearish().get(0).getDays() == 1}" for="select">One day </label>
+                                        <select class="form-select" id="select">        
+                                            <option th:each="trend : ${marketData.longestBearish()}" th:text="${#temporals.format(trend.from, 'dd/MM/yyyy') + ' - ' + #temporals.format(trend.to, 'dd/MM/yyyy')}"></option>
+                                        </select>
+                                    </td> 
+                                    <td th:if="${marketData.longestBearish().isEmpty()}" th:text="${'No bearish trends between ' + #temporals.format(marketData.from, 'dd/MM/yyyy') + ' and ' + #temporals.format(marketData.to, 'dd/MM/yyyy')}"></td>
+                                    <td th:if="${marketData.longestBearish().size() == 1 and marketData.longestBearish().get(0).getDays() > 1}" th:text="${marketData.longestBearish().get(0).getDays() + ' days (' + #temporals.format(marketData.longestBearish().get(0).from, 'dd/MM/yyyy') + ' - ' + #temporals.format(marketData.longestBearish().get(0).to, 'dd/MM/yyyy') + ')'}"></td>
+                                    <td th:if="${marketData.longestBearish().size() == 1 and marketData.longestBearish().get(0).getDays() == 1}" th:text="${'One day (' + #temporals.format(marketData.longestBearish().get(0).from, 'dd/MM/yyyy') + ' - ' + #temporals.format(marketData.longestBearish().get(0).to, 'dd/MM/yyyy') + ')'}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Highest 24h Volume: </td>
+                                    <td th:text="${#numbers.formatDecimal(marketData.highestVolume().value, 0, 'WHITESPACE', 2, 'COMMA') + ' € (' + #temporals.format(marketData.highestVolume().date, 'dd/MM/yyyy') + ')'}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Highest 24h Volume/Cap: </td>
+                                    <td th:text="${#numbers.formatDecimal(marketData.highestVolumeToCapRatio().value, 1, 4) + ' (' + #temporals.format(marketData.highestVolumeToCapRatio().date, 'dd/MM/yyyy') + ')'}"></td>
+
+                                </tr>
+                                <tr>
+                                    <td>Buy: </td>
+                                    <td th:if="${marketData.whenToBuyAndSell().gap() == 0.0}">Don't</td>
+                                    <td th:unless="${marketData.whenToBuyAndSell().gap() == 0.0}" th:text="${#temporals.format(marketData.whenToBuyAndSell().getLow().getDate(), 'dd/MM/yyyy') + ' (' + #numbers.formatDecimal(marketData.whenToBuyAndSell().getLow().getValue(), 0, 'WHITESPACE', 2, 'COMMA') + ' €/btc)'}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Sell: </td>
+                                    <td th:if="${marketData.whenToBuyAndSell().gap() == 0.0}">Don't</td>
+                                    <td th:unless="${marketData.whenToBuyAndSell().gap() == 0.0}" th:text="${#temporals.format(marketData.whenToBuyAndSell().getHigh().getDate(), 'dd/MM/yyyy') + ' (' + #numbers.formatDecimal(marketData.whenToBuyAndSell().getHigh().getValue(), 0, 'WHITESPACE', 2, 'COMMA') + ' €/btc)'}"></td>
+                                </tr>
+                                <tr>
+                                    <td>Profit: </td>
+                                    <td th:if="${marketData.whenToBuyAndSell().gap() == 0.0}">No profit to be made</td>
+                                    <td th:unless="${marketData.whenToBuyAndSell().gap() == 0.0}" th:text="${#numbers.formatDecimal(marketData.whenToBuyAndSell().profit(), 1, 2) + '%'}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-1">
+                        <form method="POST" th:action="@{'/delete/' + ${queries.indexOf(marketData)}}">
+                            <button type="submit" class="btn btn-secondary"><i class="fa fa-times-circle fa-lg" aria-hidden="true"></i></button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+            <div th:if="${queries.size() == 0}">
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th colspan="2" class="text-center"> - </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>Highest Price: </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Lowest Price: </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Longest Bullish: </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Longest Bearish: </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Highest 24h Volume: </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Highest 24h Volume/Cap: </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Buy: </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Sell: </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Profit: </td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+        <script>
+
+            var today = new Date();
+            var yesterday = new Date(Date.now() - 24*60*60*1000);
+
+            from.max = yesterday.toISOString().split("T")[0];
+            to.max = today.toISOString().split("T")[0];
+
+            $(document).ready(function () {
+            $("#from").change(function () {
+            var minDate = $("#from").val();
+
+            $('#to').attr('min', minDate);
+            });
+            });
+        </script>
+    </body>
+</html>
