@@ -191,7 +191,11 @@
             $("#from").change(function () {
             var minDate = $("#from").val();
 
-            $('#to').attr('min', minDate);
+            var fromDate = new Date(minDate);
+            var minToDate = new Date(fromDate - ( - 24*60*60*1000));
+            
+            $('#to').attr('min', minToDate.toISOString().split("T")[0]);
+
             });
             });
 

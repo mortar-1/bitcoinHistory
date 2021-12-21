@@ -21,7 +21,7 @@ public class MarketData implements Comparable<MarketData> {
     private List<MarketDataRecord> totalVolumes;
 
     private Granularity granularity;
-    
+
     private LocalDateTime created;
 
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
@@ -124,18 +124,15 @@ public class MarketData implements Comparable<MarketData> {
         MarketDataRecord highest = createVolumeToCapRatioRecord(volumes, caps, 0);
 
         for (int i = 0; i < volumes.size(); i++) {
-            
+
             MarketDataRecord challenger = createVolumeToCapRatioRecord(volumes, caps, i);
-            
+
             if (challenger.getValue() > highest.getValue()) {
-                
+
                 highest = challenger;
             }
         }
-        System.out.println("");
-        System.out.println("Volume / Cap: value = " + highest.getValue() + "; DateTime = " + highest.getDateTime().format(formatter));
-        System.out.println("");
-        
+
         return highest;
     }
 
@@ -155,7 +152,7 @@ public class MarketData implements Comparable<MarketData> {
     }
 
     public MarketDataRecord findLowestFrom(List<MarketDataRecord> list) {
-                
+
         MarketDataRecord lowest = list.get(0);
 
         for (MarketDataRecord mdr : list) {
@@ -172,8 +169,6 @@ public class MarketData implements Comparable<MarketData> {
     public ValueGap whenToBuyAndSell() {
 
         if (lowestPrice().getDate().isBefore(highestPrice().getDate())) {
-
-            System.out.println("!!!!!!!!!! LOWEST BEFORE HIGHEST !!!!!!!!!!");
 
             return new ValueGap(lowestPrice(), highestPrice());
         }
@@ -192,9 +187,6 @@ public class MarketData implements Comparable<MarketData> {
                 biggest = biggestPositiveGapToFollowingTimePoints(list, i);
             }
         }
-
-        System.out.println("");
-        System.out.println("BIGGEST: from = " + biggest.getLow().getDate() + " (" + biggest.getLow().getValue() + "); to = " + biggest.getHigh().getDate() + " (" + biggest.getHigh().getValue() + "); gap = " + biggest.gap());
 
         return biggest;
     }
@@ -359,10 +351,6 @@ public class MarketData implements Comparable<MarketData> {
 
         List<MarketDataRecord> pam = getPricesAtMidnights();
 
-        // PRINT PRICES AT MIDNIGHT
-        pam.stream().forEach(mdr -> System.out.println(mdr.getDate() + "  :  " + mdr.getValue()));
-        System.out.println("");
-
         List<Trend> bullTrends = new ArrayList<>();
 
         List<MarketDataRecord> longest = new ArrayList<>();
@@ -431,10 +419,10 @@ public class MarketData implements Comparable<MarketData> {
 
         return bullTrends;
     }
-    
+
     @Override
     public int compareTo(MarketData other) {
-        
+
         return other.created.compareTo(this.created);
     }
 }
