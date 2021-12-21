@@ -43,7 +43,7 @@
                     <input type="date" class="form-control" id="to" name="to"/>
                 </div>
                 <input type="submit" id="submit" style="display: none"/>
-                <button type="button" class="btn btn-warning mb-2" onclick="document.getElementById('submit').click(); this.disabled=true;">Fetch</button>
+                <button type="button" class="btn btn-warning mb-2" onclick="document.getElementById('submit').click();">Fetch</button>
             </form>
 
             <div th:unless="${queries.size() == 0}">
@@ -194,6 +194,7 @@
             $('#to').attr('min', minDate);
             });
             });
+
         </script>
     </body>
 </html>
