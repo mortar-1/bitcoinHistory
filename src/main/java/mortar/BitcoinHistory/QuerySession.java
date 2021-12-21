@@ -8,14 +8,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class Session {
+public class QuerySession {
 
-    private List<MarketData> queries;
-
-    public Session() {
-
-        queries = new ArrayList<>();
-    }
+    private List<MarketData> queries = new ArrayList<>();
 
     public List<MarketData> getQueries() {
         return queries;

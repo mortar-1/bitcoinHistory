@@ -20,33 +20,36 @@ import reactor.core.publisher.Mono;
 public class MarketDataService {
 
     @Autowired
-    private Session session;
+    private QuerySession qSession;
 
-    public void addAttributesToModelForPageMain(Model model, String from, String to) {
+    public void addAttributesToModelForPageMain(Model model) {
+
+        List<MarketData> queries = qSession.getQueries();
+
+        Collections.sort(queries);
+     
+        model.addAttribute("queries", queries);
+
+    }
+
+    public void fetch(String from, String to) {
 
         if (!(from == null || to == null || from.isBlank() || to.isBlank())) {
 
             MarketData md = getMarketData(from, to);
 
-            session.getQueries().add(md);
+            qSession.getQueries().add(md);
         }
-        
-        List<MarketData> queries = session.getQueries();
-        
-        Collections.sort(queries);
-
-        model.addAttribute("queries", queries);
-        
     }
 
     public void deleteQuery(int index) {
 
-        session.getQueries().remove(index);
+        qSession.getQueries().remove(index);
     }
 
     public void clearSession() {
 
-        session.getQueries().clear();
+        qSession.getQueries().clear();
     }
 
     public MarketData getMarketData(String from, String to) {

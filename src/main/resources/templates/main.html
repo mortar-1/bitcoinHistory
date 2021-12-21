@@ -22,7 +22,7 @@
 
         <div style="background: wheat">
             <div class="text-center">
-                <img th:src="@{/logo.png}" style="height:150px"/>
+                <img src="/logo.png" style="height:150px"/>
             </div>
             <div>
                 <p>Data by CoinGecko</p>
@@ -31,11 +31,9 @@
 
         <br/>
 
-
-
         <div class="container">
 
-            <form th:action="@{/}" method="GET" class="form-inline">
+            <form action="/" method="POST" class="form-inline">
                 <div class="form-group mx-sm-3 mb-2">
                     <label for="from" class="mx-sm-3">From</label>
                     <input type="date" class="form-control" id="from" name="from"/>
