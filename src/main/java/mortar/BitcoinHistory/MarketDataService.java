@@ -27,7 +27,7 @@ public class MarketDataService {
         List<MarketData> queries = qSession.getQueries();
 
         Collections.sort(queries);
-     
+
         model.addAttribute("queries", queries);
 
     }
@@ -44,11 +44,14 @@ public class MarketDataService {
 
     public void deleteQuery(int index) {
 
-        qSession.getQueries().remove(index);
+        if (!qSession.getQueries().isEmpty()) {
+
+            qSession.getQueries().remove(index);
+        }
     }
 
     public void clearSession() {
-
+                
         qSession.getQueries().clear();
     }
 
